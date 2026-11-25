@@ -1,9 +1,9 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy import text
 
-from db.session import SessionDep
-
-from .core.config import Settings, get_settings
+from app.api.v1.router import api_router
+from app.core.config import Settings, get_settings
+from app.core.exceptions.handlers import register_exception_handlers
 from app.db.session import SessionDep
 
 settings = get_settings()
