@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # meta
 
     META_APP_ID: str
-    META_REDIRECT_URI: str ="http://localhost:5000/api/auth/facebook/callback"
+    META_REDIRECT_URI: str ="http://localhost:8000/api/v1/auth/facebook/callback"
     META_APP_SECRET: str
     META_APP_CONFIG_ID: str
     META_WEBHOOK_TOKEN: str
