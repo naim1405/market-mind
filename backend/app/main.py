@@ -4,6 +4,7 @@ from sqlalchemy import text
 from db.session import SessionDep
 
 from .core.config import Settings, get_settings
+from app.db.session import SessionDep
 
 settings = get_settings()
 
