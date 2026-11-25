@@ -20,11 +20,13 @@ async def login_by_facebook(service:AuthServiceDep):
 
 
 @router.get("/facebook/callback")
-async def facebook_callback(code:str,  service:AuthServiceDep,error:str|None = None,):
-    if(error):
+async def facebook_callback(
+    code: str,
+    service: AuthServiceDep,
+    error: str | None = None,
+):
+    if error:
         return {"error": error}
     if not code:
         return {"error": "No code provided"}
-    service.handle_facebook_callback(code)
-
-
+    return await service.handle_facebook_callback(code)

@@ -1,14 +1,14 @@
 # handle application logic
-
 import uuid
 from urllib.parse import urlencode
 
 from app.core.config import get_settings
+from app.modules.facebook.client import FacebookClient
 
 
 class AuthService:
-    def __init__(self, repo):
-        pass
+    def __init__(self, repo, facebook_client:FacebookClient):
+        self.facebook_client = facebook_client
 
     def hello_auth(self):
         return {"message": "Hello from AuthService"}
@@ -39,8 +39,10 @@ class AuthService:
         return redirect_url
     
 
-    def handle_facebook_callback(self, code):
-        print('🚀 handling code : ', code)
+    async def handle_facebook_callback(self, code):
+        result = await self.facebook_client.verify_code(code)
+
+        print('🚀 handling code : ', result)
 
 
 
