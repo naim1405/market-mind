@@ -15,12 +15,22 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    # db
     DB_HOST: str = "db"
     DB_PORT: str = 5432
     DB_USER: str = "postgres"
     DB_PASSWORD: SecretStr = SecretStr(secret_value="postgres")
     DB_NAME: str = "market_mind_ai"
     DB_SCHEMA: str = "public"
+
+
+    # meta
+
+    META_APP_ID: str
+    META_REDIRECT_URI: str ="http://localhost:5000/api/auth/facebook/callback"
+    META_APP_SECRET: str
+    META_APP_CONFIG_ID: str
+    META_WEBHOOK_TOKEN: str
 
     @property
     def DATABASE_URL(self) -> URL:
