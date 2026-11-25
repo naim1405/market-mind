@@ -1,16 +1,26 @@
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI
 from sqlalchemy import text
 
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
 from app.core.exceptions.handlers import register_exception_handlers
+from app.core.http import http_client
 from app.db.session import SessionDep
 
 settings = get_settings()
 
 
 
-app = FastAPI(title=settings.APP_NAME)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup code
+    yield
+    # shutdown code
+    await http_client.aclose()
+
+app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)
 register_exception_handlers(app)
 app.include_router(api_router)
 
