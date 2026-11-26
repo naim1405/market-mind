@@ -4,7 +4,7 @@ from sqlalchemy import true
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import Boolean, String
 
-from db.base import Base, TimeStampMixin
+from app.db.base import Base, TimeStampMixin
 
 
 class User(Base, TimeStampMixin):
