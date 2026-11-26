@@ -1,14 +1,14 @@
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool, text
+from sqlalchemy import pool
 from sqlalchemy.engine import URL, Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from app.core.config import get_settings
-from db.all_models import *
-from db.base import Base
+from app.db.all_models import *
+from app.db.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -61,14 +61,16 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    schema = get_settings().DB_SCHEMA
-    connection.execute(text(f"SET search_path TO {schema}, public"))
-    connection.commit()
-    context.configure(connection=connection, target_metadata=target_metadata, version_table_schema=schema, include_schemas=True)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        version_table="alembic_version",
+        version_table_schema="public",
+        include_schemas=False,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
-
 
 async def run_async_migrations() -> None:
     """In this scenario we need to create an Engine
