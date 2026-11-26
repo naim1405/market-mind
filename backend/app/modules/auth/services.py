@@ -3,12 +3,21 @@ import uuid
 from urllib.parse import urlencode
 
 from app.core.config import get_settings
+from app.modules.auth.repositories import AuthRepository
 from app.modules.facebook.client import FacebookClient
+from app.modules.users.repositories import UserRepository
 
 
 class AuthService:
-    def __init__(self, repo, facebook_client:FacebookClient):
+    def __init__(
+        self,
+        repo: AuthRepository,
+        facebook_client: FacebookClient,
+        user_repo: UserRepository,
+    ):
         self.facebook_client = facebook_client
+        self.auth_repo = repo
+        self.user_repo = repo
 
     def hello_auth(self):
         return {"message": "Hello from AuthService"}
