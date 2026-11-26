@@ -11,7 +11,7 @@ class PageBase(BaseModel):
 
 
 class PageCreate(PageBase):
-    pass
+    user_id: uuid.UUID
 
 
 class PageUpdate(BaseModel):

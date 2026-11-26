@@ -17,6 +17,7 @@ class PagesRepository:
                 name=page_data.name,
                 facebook_id=page_data.facebook_id,
                 access_token=page_data.access_token,
+                user_id=page_data.user_id,
             )
             .on_conflict_do_update(
                 index_elements=[Pages.facebook_id],
@@ -24,6 +25,7 @@ class PagesRepository:
                     "name": page_data.name,
                     "facebook_id": page_data.facebook_id,
                     "access_token": page_data.access_token,
+                    "user_id": page_data.user_id,
                 },
             )
             .returning(Pages)
