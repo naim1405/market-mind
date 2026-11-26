@@ -20,5 +20,5 @@ class User(Base, TimeStampMixin):
         String(255), unique=True, index=True, nullable=True
     )
     pages: Mapped[list["Pages"]] = relationship(
-        back_populates="users", cascade="all, delete-orphan"
+        back_populates="user", cascade="all, delete-orphan"
     )
