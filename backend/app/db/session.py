@@ -35,4 +35,4 @@ async def get_session() -> AsyncIterator[AsyncSession]:
 
 SessionDep = Annotated[AsyncSession, Depends(dependency=get_session, scope="function")]
 
-StreamingSessionDep: Annotated[AsyncSession, Depends(dependency=get_session)]
+StreamingSessionDep = Annotated[AsyncSession, Depends(dependency=get_session)]
