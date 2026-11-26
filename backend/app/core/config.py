@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL
 
@@ -25,12 +25,18 @@ class Settings(BaseSettings):
 
 
     # meta
-
     META_APP_ID: str
     META_REDIRECT_URI: str ="http://localhost:8000/api/v1/auth/facebook/callback"
     META_APP_SECRET: str
     META_APP_CONFIG_ID: str
     META_WEBHOOK_TOKEN: str
+
+    # jwt
+    JWT_SECRET: SecretStr = Field(min_length=32)
+    JWT_REFRESH_SECRET: SecretStr = Field(min_length=32)
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_MINUTES: int = 30
+    REFRESH_TOKEN_DAYS: int = 7
 
     @property
     def DATABASE_URL(self) -> URL:

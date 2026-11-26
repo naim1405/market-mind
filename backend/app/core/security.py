@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from uuid import UUID
 
 import jwt
 from pwdlib import PasswordHash
@@ -17,14 +18,16 @@ def verify_password(password: str, hashed: str) -> bool:
     return password_hash.verify(password, hashed)
 
 
-def create_access_token(user_id: str) -> str:
+def create_access_token(user_id: str | UUID) -> str:
     settings = get_settings()
     now = datetime.now(UTC)
+
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
         "iat": now,
         "exp": now + timedelta(minutes=settings.ACCESS_TOKEN_MINUTES),
     }
+
     return jwt.encode(
         payload,
         settings.JWT_SECRET.get_secret_value(),
@@ -32,9 +35,26 @@ def create_access_token(user_id: str) -> str:
     )
 
 
-def decode_access_token(token: str) -> dict[str, Any] | None:
-    """The payload if the signature and expiry are valid, else None."""
+def create_refresh_token(user_id: str | UUID) -> str:
     settings = get_settings()
+    now = datetime.now(UTC)
+
+    payload = {
+        "sub": str(user_id),
+        "iat": now,
+        "exp": now + timedelta(days=settings.REFRESH_TOKEN_DAYS),
+    }
+
+    return jwt.encode(
+        payload,
+        settings.JWT_REFRESH_SECRET.get_secret_value(),
+        algorithm=settings.JWT_ALGORITHM,
+    )
+
+
+def decode_access_token(token: str) -> dict[str, Any] | None:
+    settings = get_settings()
+
     try:
         return jwt.decode(
             token,
