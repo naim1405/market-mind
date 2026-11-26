@@ -16,86 +16,89 @@ class FacebookClient:
     def __init__(self, http: httpx.AsyncClient):
         self.http = http
 
-    async def graph_fetch(self, url: str, schema):
-        response = await self.http.get(url)
-        raw = response.json()
+    async def graph_fetch(
+        self,
+        url: str,
+        params: dict,
+        schema=None,
+        method: str = "GET",
+    ):
+        response = await self.http.request(
+            method=method,
+            url=url,
+            params=params,
+        )
 
         response.raise_for_status()
 
-        return schema.model_validate(raw)
+        raw = response.json()
+
+        if schema:
+            return schema.model_validate(raw)
+
+        return raw
 
     async def get_me(self, access_token: str):
-        response = await self.http.get(
-            f"{GRAPH_API_BASE}/me",
+        return await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/me",
             params={
                 "fields": "id,name,email,accounts",
                 "access_token": access_token,
             },
+            schema=FacebookUserSchema,
         )
 
-        response.raise_for_status()
-
-        return FacebookUserSchema.model_validate(response.json())
-
     async def get_pages(self, access_token: str):
-        response = await self.http.get(
-            f"{GRAPH_API_BASE}/me",
+        return await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/me",
             params={
                 "fields": "accounts{id,name,access_token}",
                 "access_token": access_token,
             },
+            schema=FacebookAccountsSchema,
         )
 
-        response.raise_for_status()
-
-        return FacebookAccountsSchema.model_validate(response.json())
-
     async def get_page(self, page_id: str, access_token: str):
-        response = await self.http.get(
-            f"{GRAPH_API_BASE}/{page_id}",
+        return await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/{page_id}",
             params={
                 "fields": "id,name,access_token",
                 "access_token": access_token,
             },
+            schema=FacebookPageSchema,
         )
 
-        response.raise_for_status()
-
-        return FacebookPageSchema.model_validate(response.json())
-
     async def verify_code(self, code: str):
-        print("🚀 verify_code : ", code)
-
         settings = get_settings()
-        response = await self.http.get(
-            f"{GRAPH_API_BASE}/oauth/access_token",
+
+        response = await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/oauth/access_token",
             params={
                 "client_id": settings.META_APP_ID,
                 "redirect_uri": settings.META_REDIRECT_URI,
                 "client_secret": settings.META_APP_SECRET,
                 "code": code,
             },
+            schema=FacebookCodeVerifyResponseSchema,
         )
 
-        print("🚀 response  : ", response)
+        if not response.access_token:
+            raise ValueError("Access token not found in the response.")
 
-        response.raise_for_status()
-
-        return FacebookCodeVerifyResponseSchema.model_validate(response.json())
+        return response
 
     async def subscribe_to_page(
         self,
         page_id: str,
         page_access_token: str,
     ) -> bool:
-        response = await self.http.post(
-            f"{GRAPH_API_BASE}/{page_id}/subscribed_apps",
+        response = await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/{page_id}/subscribed_apps",
             params={
                 "access_token": page_access_token,
                 "subscribed_fields": "messages,messaging_postbacks",
             },
+            method="POST",
         )
 
-        response.raise_for_status()
-
-        return response.json().get("success") is True
+        return response.get("success") is True
