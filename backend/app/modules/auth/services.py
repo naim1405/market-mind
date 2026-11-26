@@ -40,9 +40,13 @@ class AuthService:
     
 
     async def handle_facebook_callback(self, code):
-        result = await self.facebook_client.verify_code(code)
+        verified_code = await self.facebook_client.verify_code(code)
+        access_token = verified_code.access_token
+        user = await self.facebook_client.get_me(access_token)
+        print("🚀 user  : ", user)
+        # TODO:
+        # - upsert user
+        # - generate tokens
+        # - upsert pages with tokens
 
-        print('🚀 handling code : ', result)
-
-
-
+        return {"message": "Facebook callback handled successfully", "user": user}
