@@ -1,11 +1,14 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Boolean, String
 
 from app.db.base import Base, TimeStampMixin
 
+if TYPE_CHECKING:
+    from app.modules.pages.models import Pages
 
 class User(Base, TimeStampMixin):
     __tablename__ = "users"
@@ -15,4 +18,7 @@ class User(Base, TimeStampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=true())
     facebook_id: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=True
+    )
+    pages: Mapped[list["Pages"]] = relationship(
+        back_populates="users", cascade="all, delete-orphan"
     )
