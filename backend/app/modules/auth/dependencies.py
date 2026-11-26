@@ -17,11 +17,13 @@ AuthRepositoryDep = Annotated[AuthRepository, Depends(get_auth_repository)]
 
 
 def get_auth_service(
-    repo: AuthRepositoryDep,
+    auth_repo: AuthRepositoryDep,
     facebook_client: FacebookClientDep,
     user_repo: UserRepositoryDep,
 ) -> AuthService:
-    return AuthService(repo=repo, facebook_client=facebook_client)
+    return AuthService(
+        auth_repo=auth_repo, facebook_client=facebook_client, user_repo=user_repo
+    )
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

@@ -3,21 +3,23 @@ import uuid
 from urllib.parse import urlencode
 
 from app.core.config import get_settings
+from app.core.security import create_access_token, create_refresh_token
 from app.modules.auth.repositories import AuthRepository
 from app.modules.facebook.client import FacebookClient
 from app.modules.users.repositories import UserRepository
+from app.modules.users.schemas import UserCreate
 
 
 class AuthService:
     def __init__(
         self,
-        repo: AuthRepository,
+        auth_repo: AuthRepository,
         facebook_client: FacebookClient,
         user_repo: UserRepository,
     ):
         self.facebook_client = facebook_client
-        self.auth_repo = repo
-        self.user_repo = repo
+        self.auth_repo = auth_repo
+        self.user_repo = user_repo
 
     def hello_auth(self):
         return {"message": "Hello from AuthService"}
@@ -52,10 +54,21 @@ class AuthService:
         verified_code = await self.facebook_client.verify_code(code)
         access_token = verified_code.access_token
         user = await self.facebook_client.get_me(access_token)
-        print("🚀 user  : ", user)
-        # TODO:
-        # - upsert user
-        # - generate tokens
-        # - upsert pages with tokens
+        new_user = UserCreate(email=user.email, name=user.name, facebook_id=user.id)
 
-        return {"message": "Facebook callback handled successfully", "user": user}
+        # - upsert user
+        result = await self.user_repo.upsert_user(new_user)
+        # - generate tokens
+        access_token = create_access_token(result.id)
+        refresh_token = create_refresh_token(result.id)
+
+        # - upsert pages with tokens
+        await self.auth_repo.upsert_tokens(
+            access_token=access_token, refresh_token=refresh_token, user_id=result.id
+        )
+
+        return {
+            "message": "Facebook callback handled successfully",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+        }
