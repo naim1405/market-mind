@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, EmailStr
 
 
@@ -32,3 +31,35 @@ class FacebookUserSchema(BaseModel):
 class FacebookCodeVerifyResponseSchema(BaseModel):
     access_token: str
     token_type: str
+
+
+class FacebookAccount(BaseModel):
+    id: str
+    name: str
+    access_token: str
+
+
+class FacebookPagingCursors(BaseModel):
+    before: str
+    after: str
+
+
+class FacebookPaging(BaseModel):
+    cursors: FacebookPagingCursors
+
+
+class FacebookAccounts(BaseModel):
+    data: list[FacebookAccount]
+    paging: FacebookPaging
+
+
+class FacebookUser(BaseModel):
+    id: str
+    name: str
+    email: EmailStr
+    accounts: FacebookAccounts
+
+
+class FacebookGetUserResponse(BaseModel):
+    message: str
+    user: FacebookUser

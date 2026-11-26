@@ -38,8 +38,8 @@ class FacebookClient:
 
         return raw
 
-    async def get_me(self, access_token: str):
-        return await self.graph_fetch(
+    async def get_me(self, access_token: str) -> FacebookUserSchema:
+        result = await self.graph_fetch(
             url=f"{GRAPH_API_BASE}/me",
             params={
                 "fields": "id,name,email,accounts",
@@ -47,6 +47,8 @@ class FacebookClient:
             },
             schema=FacebookUserSchema,
         )
+
+        return result
 
     async def get_pages(self, access_token: str):
         return await self.graph_fetch(
