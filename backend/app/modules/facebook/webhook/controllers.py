@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 from app.core.config import get_settings
+from app.modules.facebook.webhook.dependencies import WebhookServiceDep
+from app.modules.facebook.webhook.schemas import WebhookPayloadSchema
 
 router = APIRouter(prefix="/facebook/webhook", tags=["webhook"])
 
@@ -24,7 +26,15 @@ async def verify_callback(req: Request):
 
 # webhook callback endpoint
 @router.post("/")
-async def webhook_callback(req: Request):
-    payload = await req.json()
-    print("🚀 payload : ", payload)
-    return {"message": "Callback received", "payload": payload}
+async def webhook_callback(payload: WebhookPayloadSchema, service: WebhookServiceDep):
+    if payload.object != "page":
+        raise HTTPException(status_code=404, detail="Unsupported object")
+
+    for entry in payload.entry:
+        for event in entry.messaging:
+            # only handle text messages sent by customers, skip our own echoes
+            if event.message and event.message.text and not event.message.is_echo:
+                # TODO: push the event to a queue instead of replying inline
+                await service.reply_to_page_message(event)
+
+    return {"message": "EVENT_RECEIVED"}
