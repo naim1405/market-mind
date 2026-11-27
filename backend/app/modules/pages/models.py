@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimeStampMixin
 
 if TYPE_CHECKING:
+    from app.modules.products.models import Product
     from app.modules.users.models import User
 
 class Pages(Base, TimeStampMixin):
@@ -17,3 +18,6 @@ class Pages(Base, TimeStampMixin):
     access_token: Mapped[str] = mapped_column(String, nullable=False)
     user: Mapped["User"] = relationship(back_populates="pages")
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
+    products: Mapped[list["Product"]] = relationship(
+        back_populates="page", cascade="all, delete-orphan"
+    )
