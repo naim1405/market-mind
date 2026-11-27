@@ -15,3 +15,11 @@ dependencies = [
     "pyjwt>=2.15.1",
     "sqlalchemy[asyncio]>=2.1.9",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
