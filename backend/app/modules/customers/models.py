@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimeStampMixin
 
 if TYPE_CHECKING:
+    from app.modules.messages.models import Message
     from app.modules.orders.models import Order
     from app.modules.pages.models import Pages
 
@@ -30,3 +31,6 @@ class Customer(Base, TimeStampMixin):
     address: Mapped[str | None] = mapped_column(Text)
 
     orders: Mapped[list["Order"]] = relationship(back_populates="customer")
+    messages: Mapped[list["Message"]] = relationship(
+        back_populates="customer", cascade="all, delete-orphan"
+    )

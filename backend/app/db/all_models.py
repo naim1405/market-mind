@@ -6,3 +6,4 @@ from app.modules.users.models import User  # noqa: F401
 from app.modules.products.models import Product  # noqa: F401
 from app.modules.orders.models import Order, OrderItem  # noqa: F401
 from app.modules.customers.models import Customer  # noqa: F401
+from app.modules.messages.models import Message  # noqa: F401
