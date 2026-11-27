@@ -88,3 +88,32 @@ async def page(db_session):
     db_session.add(page)
     await db_session.flush()
     return page
+
+
+@pytest.fixture
+async def product(db_session, page):
+    from app.modules.products.models import Product
+
+    product = Product(
+        page_id=page.id,
+        sku="PJ-01",
+        name="Cotton Panjabi",
+        category="Panjabi",
+        selling_price=1500,
+        min_floor_price=1200,
+        stock_qty=5,
+        image_urls=["https://res.cloudinary.com/demo/a.jpg"],
+    )
+    db_session.add(product)
+    await db_session.flush()
+    return product
+
+
+@pytest.fixture
+async def customer(db_session, page):
+    from app.modules.customers.models import Customer
+
+    customer = Customer(page_id=page.id, psid="psid-1", name="Rahim")
+    db_session.add(customer)
+    await db_session.flush()
+    return customer
