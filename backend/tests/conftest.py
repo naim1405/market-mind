@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal
 
 # must be set before the app (and its settings/engine) are imported
 os.environ["DB_NAME"] = "market_mind_ai_test"
@@ -99,8 +100,8 @@ async def product(db_session, page):
         sku="PJ-01",
         name="Cotton Panjabi",
         category="Panjabi",
-        selling_price=1500,
-        min_floor_price=1200,
+        selling_price=Decimal("1500.00"),
+        min_floor_price=Decimal("1200.00"),
         stock_qty=5,
         image_urls=["https://res.cloudinary.com/demo/a.jpg"],
     )
