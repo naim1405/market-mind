@@ -1,4 +1,19 @@
+from enum import StrEnum
+
 from pydantic import BaseModel, EmailStr
+
+
+class MessagingType(StrEnum):
+    RESPONSE = "RESPONSE"  # reply within the 24h window
+    UPDATE = "UPDATE"  # message first, within the 24h window
+    MESSAGE_TAG = "MESSAGE_TAG"  # outside the 24h window, requires a tag
+
+
+class MessageTag(StrEnum):
+    POST_PURCHASE_UPDATE = "POST_PURCHASE_UPDATE"
+    CONFIRMED_EVENT_UPDATE = "CONFIRMED_EVENT_UPDATE"
+    ACCOUNT_UPDATE = "ACCOUNT_UPDATE"
+    HUMAN_AGENT = "HUMAN_AGENT"
 
 
 class FacebookPageSchema(BaseModel):

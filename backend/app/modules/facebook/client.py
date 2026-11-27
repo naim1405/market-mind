@@ -6,9 +6,11 @@ from app.modules.facebook.schemas import (
     FacebookCodeVerifyResponseSchema,
     FacebookPageSchema,
     FacebookUserSchema,
+    MessageTag,
+    MessagingType,
 )
 
-GRAPH_API_BASE = "https://graph.facebook.com/v25.0"
+GRAPH_API_BASE = "https://graph.facebook.com/v27.0"
 
 
 class FacebookClient:
@@ -22,11 +24,13 @@ class FacebookClient:
         params: dict,
         schema=None,
         method: str = "GET",
+        json: dict | None = None,
     ):
         response = await self.http.request(
             method=method,
             url=url,
             params=params,
+            json=json,
         )
 
         response.raise_for_status()
@@ -103,4 +107,39 @@ class FacebookClient:
             method="POST",
         )
 
+        print("🚀 subscribe response  : ", response)
+
         return response.get("success") is True
+
+    async def send_message(
+        self,
+        page_id: str,
+        page_access_token: str,
+        recipient_id: str,
+        message: dict,
+        messaging_type: MessagingType = MessagingType.RESPONSE,
+        tag: MessageTag | None = None,
+    ):
+        """Send any Send API message: text, attachment, template, quick replies.
+
+        `message` is the Send API `message` object, e.g. {"text": "hi"}.
+        """
+        if (messaging_type == MessagingType.MESSAGE_TAG) != (tag is not None):
+            raise ValueError(
+                "tag is required with MESSAGE_TAG and only allowed with it"
+            )
+
+        body = {
+            "recipient": {"id": recipient_id},
+            "messaging_type": messaging_type,
+            "message": message,
+        }
+        if tag:
+            body["tag"] = tag
+
+        return await self.graph_fetch(
+            url=f"{GRAPH_API_BASE}/{page_id}/messages",
+            params={"access_token": page_access_token},
+            json=body,
+            method="POST",
+        )
