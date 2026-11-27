@@ -18,7 +18,6 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    page_id: uuid.UUID
     min_floor_price: Decimal = Price
     max_discount_pct: Decimal = Field(default=Decimal(0), ge=0, le=100)
 
