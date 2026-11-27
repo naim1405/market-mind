@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,6 +32,12 @@ class PagesRepository:
             .returning(Pages)
         )
 
+        result = await self.db_session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    # get page by facebook page id
+    async def get_page_by_facebook_id(self, facebook_id: str) -> Pages | None:
+        stmt = select(Pages).where(Pages.facebook_id == facebook_id)
         result = await self.db_session.execute(stmt)
         return result.scalar_one_or_none()
 
