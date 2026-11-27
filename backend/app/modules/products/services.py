@@ -30,9 +30,9 @@ class ProductService:
         return await self.product_repo.list_products(page_id, **filters)
 
     async def update_product(
-        self, product_id: uuid.UUID, data: ProductUpdate
+        self, page_id: uuid.UUID, product_id: uuid.UUID, data: ProductUpdate
     ) -> Product:
-        product = await self.get_product(product_id)
+        product = await self.get_product(page_id, product_id)
         changes = data.model_dump(exclude_unset=True)
 
         # ProductUpdate can't see stored values, so check the floor against the merged result

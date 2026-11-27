@@ -46,6 +46,7 @@ class ProductRepository:
         for field, value in data.items():
             setattr(product, field, value)
         await self.db_session.flush()
+        await self.db_session.refresh(product)
         return product
 
     async def delete_product(self, product: Product) -> None:
