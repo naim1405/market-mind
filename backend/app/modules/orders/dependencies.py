@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from app.db.session import SessionDep
+from app.modules.customers.dependencies import CustomerRepositoryDep
 from app.modules.orders.repositories import OrderRepository
 from app.modules.orders.services import OrderService
 from app.modules.products.dependencies import ProductRepositoryDep
@@ -18,8 +19,13 @@ OrderRepositoryDep = Annotated[OrderRepository, Depends(get_order_repository)]
 def get_order_service(
     order_repo: OrderRepositoryDep,
     product_repo: ProductRepositoryDep,
+    customer_repo: CustomerRepositoryDep,
 ) -> OrderService:
-    return OrderService(order_repo=order_repo, product_repo=product_repo)
+    return OrderService(
+        order_repo=order_repo,
+        product_repo=product_repo,
+        customer_repo=customer_repo,
+    )
 
 
 OrderServiceDep = Annotated[OrderService, Depends(get_order_service)]
